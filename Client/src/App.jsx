@@ -1,121 +1,99 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useCallback, useEffect } from "react";
+import { useStore } from "./store/useStore";
+import { transcribeAudio } from "./services/transcriptionService";
+import { useSuggestions } from "./hooks/useSuggestions";
+import { useChat } from "./hooks/useChat";
+import Header from "./components/layout/Header";
+import ThreeColumnLayout from "./components/layout/ThreeColumnLayout";
+import TranscriptPanel from "./components/transcript/TranscriptPanel";
+import SuggestionsPanel from "./components/suggestions/SuggestionsPanel";
+import ChatPanel from "./components/chat/ChatPanel";
+import SettingsModal from "./components/settings/SettingsModal";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+    const [showSettings, setShowSettings] = useState(false);
+    const [isTranscribing, setIsTranscribing] = useState(false);
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    const addTranscriptEntry = useStore((s) => s.addTranscriptEntry);
+    const apiKey = useStore((s) => s.apiKey);
+    const refreshInterval = useStore((s) => s.refreshInterval);
+
+    const {
+        isLoading: suggestionsLoading,
+        error: suggestionsError,
+        refresh: refreshSuggestions,
+        startAutoRefresh,
+        stopAutoRefresh,
+    } = useSuggestions();
+
+    const { isStreaming, error: chatError, sendSuggestion, sendQuestion } = useChat();
+
+    // Handle each 30s audio chunk from the recorder
+    const handleAudioChunk = useCallback(
+        async (audioBlob) => {
+            if (!apiKey) {
+                setShowSettings(true);
+                return;
+            }
+
+            setIsTranscribing(true);
+            try {
+                const text = await transcribeAudio(audioBlob);
+                if (text && text.trim()) {
+                    addTranscriptEntry(text);
+                    // After new transcript is added, refresh suggestions
+                    setTimeout(() => refreshSuggestions(), 500);
+                }
+            } catch (err) {
+                console.error("Transcription error:", err);
+            } finally {
+                setIsTranscribing(false);
+            }
+        },
+        [apiKey, addTranscriptEntry, refreshSuggestions]
+    );
+
+    // Auto-refresh suggestions on interval
+    useEffect(() => {
+        if (apiKey) {
+            startAutoRefresh(refreshInterval);
+        }
+        return () => stopAutoRefresh();
+    }, [apiKey, refreshInterval, startAutoRefresh, stopAutoRefresh]);
+
+    // Show settings on first load if no API key
+    useEffect(() => {
+        if (!apiKey) {
+            setShowSettings(true);
+        }
+    }, []);
+
+    return (
+        <div className="flex flex-col h-screen bg-gray-950">
+            <Header onOpenSettings={() => setShowSettings(true)} />
+
+            <ThreeColumnLayout
+                left={<TranscriptPanel onAudioChunk={handleAudioChunk} />}
+                middle={
+                    <SuggestionsPanel
+                        onRefresh={refreshSuggestions}
+                        isLoading={suggestionsLoading || isTranscribing}
+                        error={!apiKey ? "Set your Groq API key in Settings first." : suggestionsError}
+                        onSuggestionClick={sendSuggestion}
+                    />
+                }
+                right={
+                    <ChatPanel
+                        onSendQuestion={sendQuestion}
+                        isStreaming={isStreaming}
+                        error={chatError}
+                        apiKeyMissing={!apiKey}
+                        onOpenSettings={() => setShowSettings(true)}
+                    />
+                }
+            />
+
+            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    );
 }
-
-export default App
