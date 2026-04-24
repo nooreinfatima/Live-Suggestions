@@ -1,4 +1,5 @@
-export const API_BASE_URL = "http://localhost:3001/api";
+// export const API_BASE_URL = "http://localhost:3001/api";
+export const API_BASE_URL = "https://live-suggestions.onrender.com/api" || "http://localhost:3001/api";
 
 export const DEFAULT_SUGGESTION_PROMPT = `You are an intelligent AI meeting copilot. You are listening to a live conversation and must provide exactly 3 useful, contextually relevant suggestions based on the recent transcript.
 
