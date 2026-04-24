@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 body {
-    @apply bg-gray-950 text-white;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    @apply bg-slate-950 text-slate-100;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hide scrollbar but keep scrolling */
+/* Scrollbar */
 .overflow-y-auto::-webkit-scrollbar {
     width: 4px;
 }
@@ -17,15 +18,15 @@ body {
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(168, 85, 247, 0.2);
     border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(168, 85, 247, 0.35);
 }
 
-/* Chat content basic markdown styling */
+/* Chat markdown styling */
 .chat-content strong {
     font-weight: 600;
     color: #e2e8f0;
@@ -51,7 +52,7 @@ body {
 }
 
 .chat-content code {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(168, 85, 247, 0.1);
     padding: 0.1em 0.3em;
     border-radius: 3px;
     font-size: 0.85em;

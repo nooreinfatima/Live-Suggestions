@@ -10,8 +10,8 @@ export default function TranscriptPanel({ onAudioChunk }) {
     return (
         <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-900/50">
-                <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-purple-900/30 bg-gray-900/60">
+                <h2 className="text-base font-semibold text-purple-300 uppercase tracking-wider">
                     📝 Transcript
                 </h2>
                 <MicControl onAudioChunk={onAudioChunk} />
@@ -20,15 +20,14 @@ export default function TranscriptPanel({ onAudioChunk }) {
             {/* Transcript content */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto">
                 {entries.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-500 px-8 text-center">
-                        <div className="text-4xl mb-3">🎤</div>
-                        <p className="text-sm">Click the mic to start recording.</p>
-                        <p className="text-xs mt-1 text-gray-600">
-                            Transcript will appear here in real-time.
+                    <div className="flex flex-col items-center justify-center h-full text-slate-400 px-8 text-center">
+                        <p className="text-base">📭 No transcript yet</p>
+                        <p className="text-sm mt-1.5 text-slate-500">
+                            Click the mic button to start recording.
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-800/50">
+                    <div className="divide-y divide-purple-900/20">
                         {entries.map((entry) => (
                             <TranscriptItem key={entry.id} entry={entry} />
                         ))}

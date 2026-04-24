@@ -4,14 +4,21 @@ import { fetchSuggestions } from "../services/suggestionService";
 
 /**
  * Hook for managing suggestion generation — auto-refresh and manual refresh.
+ * Includes a concurrency lock to prevent duplicate parallel API calls.
  * @returns {{ isLoading, error, refresh, startAutoRefresh, stopAutoRefresh }}
  */
 export function useSuggestions() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const intervalRef = useRef(null);
+    const isRefreshingRef = useRef(false);
 
     const refresh = useCallback(async () => {
+        // Concurrency lock — skip if already refreshing
+        if (isRefreshingRef.current) {
+            return;
+        }
+
         const state = useStore.getState();
         const transcript = state.getFullTranscript();
 
@@ -24,6 +31,7 @@ export function useSuggestions() {
             return;
         }
 
+        isRefreshingRef.current = true;
         setIsLoading(true);
         setError(null);
 
@@ -36,6 +44,7 @@ export function useSuggestions() {
         } catch (err) {
             setError(err.message);
         } finally {
+            isRefreshingRef.current = false;
             setIsLoading(false);
         }
     }, []);

@@ -30,9 +30,10 @@ Provide a helpful, concise, and accurate response. Use markdown formatting for r
 
 /** Suggestion type display configuration */
 export const SUGGESTION_TYPE_CONFIG = {
-    question_to_ask: { label: "Question", color: "blue", icon: "❓" },
-    talking_point: { label: "Talking Point", color: "purple", icon: "💡" },
-    answer: { label: "Answer", color: "green", icon: "✅" },
-    fact_check: { label: "Fact Check", color: "amber", icon: "🔍" },
-    clarification: { label: "Clarification", color: "cyan", icon: "💬" },
+    question_to_ask: { label: "Question", color: "purple", emoji: "❓" },
+    talking_point: { label: "Talking Point", color: "slate", emoji: "🗣️" },
+    answer: { label: "Answer", color: "emerald", emoji: "✅" },
+    fact_check: { label: "Fact Check", color: "amber", emoji: "🔍" },
+    clarification: { label: "Clarification", color: "pink", emoji: "💡" },
 };
+

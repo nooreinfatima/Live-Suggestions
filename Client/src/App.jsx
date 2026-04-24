@@ -41,8 +41,6 @@ export default function App() {
                 const text = await transcribeAudio(audioBlob);
                 if (text && text.trim()) {
                     addTranscriptEntry(text);
-                    // After new transcript is added, refresh suggestions
-                    setTimeout(() => refreshSuggestions(), 500);
                 }
             } catch (err) {
                 console.error("Transcription error:", err);
@@ -50,7 +48,7 @@ export default function App() {
                 setIsTranscribing(false);
             }
         },
-        [apiKey, addTranscriptEntry, refreshSuggestions]
+        [apiKey, addTranscriptEntry]
     );
 
     // Auto-refresh suggestions on interval
@@ -69,7 +67,7 @@ export default function App() {
     }, []);
 
     return (
-        <div className="flex flex-col h-screen bg-gray-950">
+        <div className="flex flex-col h-screen bg-slate-950">
             <Header onOpenSettings={() => setShowSettings(true)} />
 
             <ThreeColumnLayout
